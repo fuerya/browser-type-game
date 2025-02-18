@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Game</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        #sentence { font-size: 24px; margin-bottom: 20px; }
+        #input { font-size: 20px; width: 100%; padding: 10px; }
+        #stats { margin-top: 20px; font-size: 18px; }
+        .correct { color: green; }
+        .incorrect { color: red; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>Typing Speed Test</h1>
+    <div id="sentence"></div>
+    <input type="text" id="input" autofocus>
+    <div id="stats">WPM: <span id="wpm">0</span> | Accuracy: <span id="accuracy">100%</span></div>
+    
+    <script>
+        const sentences = ["please send your latest remittance", "BUR008647392"];
+        const sentenceDisplay = document.getElementById("sentence");
+        const inputField = document.getElementById("input");
+        const wpmDisplay = document.getElementById("wpm");
+        const accuracyDisplay = document.getElementById("accuracy");
+        
+        let startTime, correctChars = 0, sentenceIndex = 0, totalCharsTyped = 0, totalErrors = 0;
+        function loadSentence() {
+            if (sentenceIndex < sentences.length) {
+                sentenceDisplay.textContent = sentences[sentenceIndex];
+                inputField.value = "";
+                startTime = null;
+            } else {
+                sentenceDisplay.textContent = "Game Over!";
+                inputField.style.display = "none";
+            }
+        }
+        
+        loadSentence();
+        
+        inputField.addEventListener("input", () => {
+            if (!startTime) startTime = new Date();
+            
+            let typed = inputField.value;
+            correctChars = 0;
+            let coloredText = "";
+            let targetSentence = sentences[sentenceIndex];
+            totalCharsTyped = typed.length;
+            
+            for (let i = 0; i < targetSentence.length; i++) {
+                if (i < typed.length) {
+                    if (typed[i] === targetSentence[i]) {
+                        coloredText += `<span class='correct'>${targetSentence[i]}</span>`;
+                        correctChars++;
+                    } else {
+                        coloredText += `<span class='incorrect'>${targetSentence[i]}</span>`;
+                        totalErrors++;
+                    }
+                } else {
+                    coloredText += targetSentence[i];
+                }
+            }
+            sentenceDisplay.innerHTML = coloredText;
+            
+            let elapsedTime = (new Date() - startTime) / 60000;
+            let wordsTyped = typed.trim().split(" ").length;
+            let wpm = Math.round(wordsTyped / elapsedTime);
+            let accuracy = Math.round((correctChars / totalCharsTyped) * 100) || 100;
+            
+            wpmDisplay.textContent = wpm > 0 ? wpm : 0;
+            accuracyDisplay.textContent = accuracy + "%";
+            
+            if (typed === targetSentence) {
+                sentenceIndex++;
+                setTimeout(loadSentence, 1000);
+            }
+        });
+    </script>
+</body>
+</html>
