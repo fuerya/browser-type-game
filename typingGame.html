@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Typing Game</title>
+    <title>Allegis Word Fight</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
         #sentence { font-size: 24px; margin-bottom: 20px; }
@@ -11,52 +11,76 @@
         #stats { margin-top: 20px; font-size: 18px; }
         .correct { color: green; }
         .incorrect { color: red; text-decoration: underline; }
+        #splashScreen { font-size: 24px; }
+        #startButton { font-size: 20px; padding: 10px 20px; cursor: pointer; }
+        #gameScreen { display: none; }
+        #gameOver { font-size: 24px; color: red; display: none; }
     </style>
 </head>
 <body>
-    <h1>Typing Speed Test</h1>
-    <div id="sentence"></div>
-    <input type="text" id="input" autofocus>
-    <div id="stats">WPM: <span id="wpm">0</span> | Accuracy: <span id="accuracy">100%</span></div>
+    <h1>Team Tonn Word Fight</h1>
+    
+    <div id="splashScreen">
+        <p>ready?</p>
+        <button id="startButton">Start</button>
+    </div>
+    
+    <div id="gameScreen">
+        <div id="sentence"></div>
+        <input type="text" id="input" autofocus>
+        <div id="stats">
+            WPM: <span id="wpm">0</span>
+            Time: <span id="elapsedTime">0</span> seconds
+        </div>
+    </div>
+
+    <div id="gameOver">finished!</div>
     
     <script>
-        const sentences = ["please send your latest remittance", "BUR008647392"];
+        const sentences = ["test", "test again"];
         const sentenceDisplay = document.getElementById("sentence");
         const inputField = document.getElementById("input");
         const wpmDisplay = document.getElementById("wpm");
-        const accuracyDisplay = document.getElementById("accuracy");
+        const elapsedTimeDisplay = document.getElementById("elapsedTime");
+        const splashScreen = document.getElementById("splashScreen");
+        const gameScreen = document.getElementById("gameScreen");
+        const startButton = document.getElementById("startButton");
+        const gameOverDisplay = document.getElementById("gameOver");
         
-        let startTime, correctChars = 0, sentenceIndex = 0, totalCharsTyped = 0, totalErrors = 0;
+        let startTime, sentenceIndex = 0;
+
         function loadSentence() {
             if (sentenceIndex < sentences.length) {
-                sentenceDisplay.textContent = sentences[sentenceIndex];
+                sentenceDisplay.innerHTML = sentences[sentenceIndex];
                 inputField.value = "";
-                startTime = null;
+                inputField.focus();
             } else {
-                sentenceDisplay.textContent = "Game Over!";
-                inputField.style.display = "none";
+                gameOverDisplay.style.display = "block";  // Show the game over message
+                inputField.style.display = "none";        // Hide the input field
             }
         }
-        
-        loadSentence();
-        
+
+        startButton.addEventListener("click", () => {
+            splashScreen.style.display = "none";  // Hide the splash screen
+            gameScreen.style.display = "block";   // Show the game screen
+            gameOverDisplay.style.display = "none"; // Hide the game over message initially
+            loadSentence();                       // Load the first sentence
+            startTime = new Date();               // Start the timer
+        });
+
         inputField.addEventListener("input", () => {
-            if (!startTime) startTime = new Date();
+            if (!startTime) return;  // Ensure the timer has started
             
             let typed = inputField.value;
-            correctChars = 0;
             let coloredText = "";
             let targetSentence = sentences[sentenceIndex];
-            totalCharsTyped = typed.length;
-            
+
             for (let i = 0; i < targetSentence.length; i++) {
                 if (i < typed.length) {
                     if (typed[i] === targetSentence[i]) {
                         coloredText += `<span class='correct'>${targetSentence[i]}</span>`;
-                        correctChars++;
                     } else {
                         coloredText += `<span class='incorrect'>${targetSentence[i]}</span>`;
-                        totalErrors++;
                     }
                 } else {
                     coloredText += targetSentence[i];
@@ -64,17 +88,26 @@
             }
             sentenceDisplay.innerHTML = coloredText;
             
-            let elapsedTime = (new Date() - startTime) / 60000;
-            let wordsTyped = typed.trim().split(" ").length;
-            let wpm = Math.round(wordsTyped / elapsedTime);
-            let accuracy = Math.round((correctChars / totalCharsTyped) * 100) || 100;
-            
+            // Calculate WPM
+            let elapsedTime = (new Date() - startTime) / 1000; // Time in seconds
+            let wordsTyped = targetSentence.split(" ").length; // Word count from target sentence
+            let wpm = Math.round(wordsTyped / (elapsedTime / 60)); // Convert seconds to minutes
             wpmDisplay.textContent = wpm > 0 ? wpm : 0;
-            accuracyDisplay.textContent = accuracy + "%";
-            
-            if (typed === targetSentence) {
-                sentenceIndex++;
-                setTimeout(loadSentence, 1000);
+
+            // Update the elapsed time display
+            elapsedTimeDisplay.textContent = Math.floor(elapsedTime); // Show elapsed time in seconds
+
+            // Move to the next sentence when user reaches the correct length
+            if (typed.length >= targetSentence.length) {
+                sentenceIndex++;  // Move to the next sentence
+                if (sentenceIndex < sentences.length) {
+                    setTimeout(loadSentence, 1000);  // Load the next sentence after 1 second
+                } else {
+                    setTimeout(() => {
+                        gameOverDisplay.style.display = "block";  // Show the game over message
+                        inputField.style.display = "none";        // Hide the input field
+                    }, 1000);  // Delay the game over message for smooth transition
+                }
             }
         });
     </script>
