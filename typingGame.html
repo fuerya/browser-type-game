@@ -99,6 +99,7 @@
 
             // Move to the next sentence when user reaches the correct length
             if (typed.length >= targetSentence.length) {
+                setTimeout(sentenceIndex, 1000)
                 sentenceIndex++;  // Move to the next sentence
                 if (sentenceIndex < sentences.length) {
                     setTimeout(loadSentence, 1000);  // Load the next sentence after 1 second
