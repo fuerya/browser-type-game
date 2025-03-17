@@ -9,6 +9,7 @@
         #sentence { font-size: 24px; margin-bottom: 20px; }
         #input { font-size: 20px; width: 100%; padding: 10px; }
         #stats { margin-top: 20px; font-size: 18px; }
+        #background (35, 35, 35)
         .correct { color: green; }
         .incorrect { color: red; text-decoration: underline; }
         #splashScreen { font-size: 24px; }
@@ -37,7 +38,8 @@
     <div id="gameOver">finished!</div>
     
     <script>
-        const sentences = ["test", "test again"];
+        const sentences = ["It is imperative we receive a response to avoid further escalation of your account.", "Below is an updated statement of your account.", "Please let me know if any invoice copies are necessary.", "Do you have an update you can provide regarding the past due balance?", "Can you please provide a scheduled payment date?", "InvoiceADM0804732", "BUR000000482934", "Please send your latest remittance."  
+ ];
         const sentenceDisplay = document.getElementById("sentence");
         const inputField = document.getElementById("input");
         const wpmDisplay = document.getElementById("wpm");
@@ -99,10 +101,10 @@
 
             // Move to the next sentence when user reaches the correct length
             if (typed.length >= targetSentence.length) {
-                setTimeout(sentenceIndex, 1000)
+                setTimeout(sentenceIndex, 500)
                 sentenceIndex++;  // Move to the next sentence
                 if (sentenceIndex < sentences.length) {
-                    setTimeout(loadSentence, 1000);  // Load the next sentence after 1 second
+                    setTimeout(loadSentence, 500);  // Load the next sentence after 1 second
                 } else {
                     setTimeout(() => {
                         gameOverDisplay.style.display = "block";  // Show the game over message
